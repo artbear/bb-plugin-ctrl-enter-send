@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-ctrl-enter-send",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "engines": {
     "bb": ">=0.46",
@@ -8,9 +8,12 @@
   },
   "bb": {
     "name": "Отправка по Ctrl+Enter",
-    "description": "Enter вставляет строку в композер, Ctrl+Enter или Command+Enter отправляет сообщение.",
+    "description": "Выбор клавиш отправки: Ctrl+Enter, Enter или Shift+Enter. Текущая комбинация видна при наведении на кнопку отправки.",
     "branding": {
-      "icon": "CornerDownLeft"
+      "icon": "./assets/enter-key.svg",
+      "logo": {
+        "light": "./assets/enter-key.svg"
+      }
     },
     "server": "./server.ts",
     "app": "./app.tsx"
@@ -45,6 +48,13 @@
     "clsx": "^2.1.1",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.4.0",
-    "vaul": "^1.1.2"
+    "vaul": "^1.1.2",
+    "jsdom": "^30.1.3",
+    "@types/jsdom": "^30.0.0"
+  },
+  "scripts": {
+    "test": "node --test *.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "bb plugin build ."
   }
 }

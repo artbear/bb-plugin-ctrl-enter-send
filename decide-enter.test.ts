@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decideEnter, type EnterContext, type EnterKey } from "./decide-enter.ts";
+import {
+  decideEnter,
+  type EnterContext,
+  type EnterKey,
+} from "./decide-enter.ts";
+import type { SendShortcut } from "./settings.ts";
 
 const baseKey: EnterKey = {
   key: "Enter",
@@ -12,56 +17,66 @@ const baseKey: EnterKey = {
   keyCode: 13,
   repeat: false,
 };
-
 const ready: EnterContext = {
   inComposerEditor: true,
   menuOpen: false,
   voiceActive: false,
   submitAvailable: true,
 };
+const modes: SendShortcut[] = ["ctrl-enter", "enter", "shift-enter"];
+const chords: { shortcut: SendShortcut; key: EnterKey }[] = [
+  { shortcut: "enter", key: baseKey },
+  { shortcut: "ctrl-enter", key: { ...baseKey, ctrlKey: true } },
+  { shortcut: "ctrl-enter", key: { ...baseKey, metaKey: true } },
+  { shortcut: "shift-enter", key: { ...baseKey, shiftKey: true } },
+];
 
-test("bare Enter inserts a newline", () => {
-  assert.equal(decideEnter(baseKey, ready), "newline");
-});
+for (const mode of modes) {
+  test(`${mode}: only the selected chord sends; the others insert a newline`, () => {
+    for (const chord of chords) {
+      assert.equal(
+        decideEnter(chord.key, ready, mode),
+        chord.shortcut === mode ? "submit" : "newline",
+      );
+      if (chord.shortcut !== mode) continue;
+      assert.equal(
+        decideEnter({ ...chord.key, repeat: true }, ready, mode),
+        "swallow",
+      );
+      assert.equal(
+        decideEnter(chord.key, { ...ready, submitAvailable: false }, mode),
+        "swallow",
+      );
+    }
+  });
 
-test("Ctrl+Enter and Command+Enter submit", () => {
-  assert.equal(decideEnter({ ...baseKey, ctrlKey: true }, ready), "submit");
-  assert.equal(decideEnter({ ...baseKey, metaKey: true }, ready), "submit");
-});
-
-test("a repeated submit chord is consumed without sending again", () => {
-  assert.equal(
-    decideEnter({ ...baseKey, ctrlKey: true, repeat: true }, ready),
-    "swallow",
-  );
-});
-
-test("Ctrl+Enter stays native when the send button cannot submit", () => {
-  assert.equal(
-    decideEnter({ ...baseKey, ctrlKey: true }, { ...ready, submitAvailable: false }),
-    "ignore",
-  );
-});
-
-test("Shift+Enter, Alt+Enter, and the terminal chord stay native", () => {
-  assert.equal(decideEnter({ ...baseKey, shiftKey: true }, ready), "ignore");
-  assert.equal(decideEnter({ ...baseKey, altKey: true }, ready), "ignore");
-  assert.equal(
-    decideEnter({ ...baseKey, ctrlKey: true, shiftKey: true }, ready),
-    "ignore",
-  );
-});
-
-test("suggestion menu, voice recording, and IME keep Enter", () => {
-  assert.equal(decideEnter(baseKey, { ...ready, menuOpen: true }), "ignore");
-  assert.equal(decideEnter(baseKey, { ...ready, voiceActive: true }), "ignore");
-  assert.equal(decideEnter({ ...baseKey, isComposing: true }, ready), "ignore");
-  assert.equal(decideEnter({ ...baseKey, keyCode: 229 }, ready), "ignore");
-});
-
-test("Enter outside the composer is ignored", () => {
-  assert.equal(
-    decideEnter(baseKey, { ...ready, inComposerEditor: false }),
-    "ignore",
-  );
-});
+  test(`${mode}: menus, voice, IME and unrelated shortcuts keep their native handling`, () => {
+    for (const chord of chords) {
+      for (const context of [
+        { ...ready, menuOpen: true },
+        { ...ready, voiceActive: true },
+        { ...ready, inComposerEditor: false },
+      ])
+        assert.equal(decideEnter(chord.key, context, mode), "ignore");
+      assert.equal(
+        decideEnter({ ...chord.key, isComposing: true }, ready, mode),
+        "ignore",
+      );
+      assert.equal(
+        decideEnter({ ...chord.key, keyCode: 229 }, ready, mode),
+        "ignore",
+      );
+    }
+    for (const changes of [
+      { altKey: true },
+      { ctrlKey: true, shiftKey: true },
+      { metaKey: true, shiftKey: true },
+      { ctrlKey: true, metaKey: true },
+      { key: "a" },
+    ])
+      assert.equal(
+        decideEnter({ ...baseKey, ...changes }, ready, mode),
+        "ignore",
+      );
+  });
+}
