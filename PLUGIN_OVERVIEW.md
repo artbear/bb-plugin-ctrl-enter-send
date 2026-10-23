@@ -1,15 +1,15 @@
-## Отправка и перенос строки
+## Sending and line breaks
 
-Выберите Ctrl+Enter, Enter или Shift+Enter в настройках установленного плагина. По умолчанию сообщение отправляет Ctrl+Enter; в этом режиме Command+Enter также работает на macOS. Остальные из этих комбинаций вставляют новую строку.
+Choose Ctrl+Enter, Enter, or Shift+Enter in the installed plugin's settings. Ctrl+Enter is the default; this mode also accepts Command+Enter on macOS. The other listed shortcuts insert a new line.
 
-При наведении на доступную кнопку отправки показывается выбранная комбинация. Настройка сохраняется в BB и применяется без перезагрузки плагина.
+Hover over an available send button to see the selected shortcut. BB saves the setting and applies changes without reloading the plugin.
 
-## Где работает
+## Where it works
 
-Новый тред, продолжение треда, очередь и редактор отправленного сообщения используют выбранную комбинацию для основного действия кнопки: отправки, постановки в очередь или steer. Удержание клавиши не отправляет сообщение повторно.
+New threads, thread replies, queued messages, and sent-message editors use the selected shortcut for the button's primary action: send, queue, or steer. Holding the shortcut does not send the message repeatedly.
 
-Меню автодополнения, голосовой ввод и IME сохраняют своё поведение. При отключении плагина восстанавливаются стандартные клавиши и подсказки BB.
+Autocomplete menus, voice input, and IME retain their behavior. Disabling the plugin restores BB's default keyboard handling and tooltips.
 
-## Требования
+## Requirements
 
-BB 0.46+ и Plugin SDK 0.6.49+. Внешние сервисы и учётные записи не требуются. Плагин использует доверенный content script для работы с нативным композером и стандартные настройки BB для хранения выбора.
+BB 0.46+ and Plugin SDK 0.6.49+. No external services or accounts are required. The plugin uses a trusted content script to work with BB's native composer and standard BB settings to store your choice.
