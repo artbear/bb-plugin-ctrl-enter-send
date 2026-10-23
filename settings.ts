@@ -3,7 +3,7 @@ export type SendShortcut = (typeof sendShortcuts)[number];
 
 export function parseSendShortcut(value: unknown): SendShortcut {
   const shortcut = sendShortcuts.find((shortcut) => shortcut === value);
-  if (!shortcut) throw new Error("Неизвестная комбинация отправки сообщения");
+  if (!shortcut) throw new Error("Unknown send shortcut");
   return shortcut;
 }
 

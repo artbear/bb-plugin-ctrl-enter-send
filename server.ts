@@ -6,7 +6,7 @@ export default function plugin(bb: BbPluginApi) {
   bb.settings.define({
     sendShortcut: {
       type: "select",
-      label: "Отправлять сообщение по нажатию",
+      label: "Send messages with",
       options: [...sendShortcuts],
       experimental_optionLabels: shortcutLabels,
       experimental_schema: z.enum(sendShortcuts),

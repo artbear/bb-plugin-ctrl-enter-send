@@ -84,7 +84,7 @@ export function createComposerController() {
           const label =
             button
               .getAttribute("aria-label")
-              ?.replace(/\s*\([^)]*Enter[^)]*\)/g, "") || "Отправить сообщение";
+              ?.replace(/\s*\([^)]*Enter[^)]*\)/g, "") || "Send message";
           original.applied = `${label} (${shortcutLabels[shortcut]})`;
           if (button.getAttribute("title") !== original.applied)
             button.setAttribute("title", original.applied);

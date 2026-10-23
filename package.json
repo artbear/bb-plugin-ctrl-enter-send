@@ -1,14 +1,14 @@
 {
   "name": "bb-plugin-ctrl-enter-send",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "engines": {
     "bb": ">=0.46",
     "bbPluginSdk": ">=0.6.49"
   },
   "bb": {
-    "name": "Отправка по Ctrl+Enter",
-    "description": "Выбор клавиш отправки: Ctrl+Enter, Enter или Shift+Enter. Текущая комбинация видна при наведении на кнопку отправки.",
+    "name": "Ctrl+Enter Send",
+    "description": "Choose Ctrl+Enter, Enter, or Shift+Enter to send messages. Hover over the send button to see the current shortcut.",
     "branding": {
       "icon": "./assets/enter-key.svg",
       "logo": {
