@@ -1,3 +1,5 @@
+import type { SendShortcut } from "./settings.ts";
+
 export interface EnterKey {
   key: string;
   shiftKey: boolean;
@@ -16,28 +18,30 @@ export interface EnterContext {
   submitAvailable: boolean;
 }
 
-/** `swallow` consumes the key and performs no composer action. */
 export type EnterAction = "ignore" | "newline" | "submit" | "swallow";
 
-/**
- * Bare Enter inserts a newline. Ctrl+Enter or Command+Enter runs the
- * composer's primary submit when that button is available.
- * Shift+Enter, Alt+Enter, and Ctrl/Command+Shift+Enter stay with bb.
- */
-export function decideEnter(event: EnterKey, context: EnterContext): EnterAction {
-  if (!context.inComposerEditor || context.menuOpen || context.voiceActive) {
+export function decideEnter(
+  event: EnterKey,
+  context: EnterContext,
+  shortcut: SendShortcut,
+): EnterAction {
+  if (!context.inComposerEditor || context.menuOpen || context.voiceActive)
     return "ignore";
-  }
-  if (event.isComposing || event.keyCode === 229 || event.key !== "Enter") {
+  if (event.isComposing || event.keyCode === 229 || event.key !== "Enter")
     return "ignore";
-  }
-  if (event.altKey || event.shiftKey) return "ignore";
+  if (
+    event.altKey ||
+    (event.ctrlKey && event.metaKey) ||
+    (event.shiftKey && (event.ctrlKey || event.metaKey))
+  )
+    return "ignore";
 
-  const hasCtrl = event.ctrlKey;
-  const hasMeta = event.metaKey;
-  if (hasCtrl === hasMeta) {
-    return hasCtrl ? "ignore" : "newline";
-  }
-  if (!context.submitAvailable) return "ignore";
-  return event.repeat ? "swallow" : "submit";
+  const pressed =
+    event.ctrlKey || event.metaKey
+      ? "ctrl-enter"
+      : event.shiftKey
+        ? "shift-enter"
+        : "enter";
+  if (pressed !== shortcut) return "newline";
+  return !context.submitAvailable || event.repeat ? "swallow" : "submit";
 }
