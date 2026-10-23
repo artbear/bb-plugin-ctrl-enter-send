@@ -1,33 +1,33 @@
 ---
 name: ctrl-enter-send
-description: "Настраиваемая отправка сообщений в BB по Ctrl+Enter, Enter или Shift+Enter. Используй для объяснения клавиш отправки и настройки плагина ctrl-enter-send."
+description: "Configurable message sending in BB with Ctrl+Enter, Enter, or Shift+Enter. Use to explain send shortcuts or configure the ctrl-enter-send plugin."
 ---
 
-# Отправка сообщений
+# Send shortcuts
 
-Плагин меняет нативные композеры BB: новый тред, продолжение треда, очередь и редактор отправленного сообщения.
+The plugin changes BB's native composers: new threads, thread replies, queued messages, and sent-message editors.
 
-Посмотри действующую настройку перед объяснением клавиш:
+Check the current setting before explaining which keys send a message:
 
 ```sh
 bb plugin config ctrl-enter-send
 ```
 
-`sendShortcut` определяет комбинацию отправки:
+`sendShortcut` selects the send shortcut:
 
-- `ctrl-enter` — по умолчанию; Ctrl+Enter или Command+Enter отправляет, Enter и Shift+Enter вставляют строку.
-- `enter` — Enter отправляет, Shift+Enter и Ctrl/Command+Enter вставляют строку.
-- `shift-enter` — Shift+Enter отправляет, Enter и Ctrl/Command+Enter вставляют строку.
+- `ctrl-enter` — default; Ctrl+Enter or Command+Enter sends, Enter and Shift+Enter insert a new line.
+- `enter` — Enter sends, Shift+Enter and Ctrl/Command+Enter insert a new line.
+- `shift-enter` — Shift+Enter sends, Enter and Ctrl/Command+Enter insert a new line.
 
-Выбранная комбинация выполняет основное действие кнопки: отправку, очередь или steer. Если кнопка недоступна, отправки нет. Удержание комбинации не отправляет повторно.
+The selected shortcut runs the button's primary action: send, queue, or steer. It sends nothing when the button is unavailable. Holding the shortcut does not send repeatedly.
 
-Настройка доступна в Settings → Installed plugins → Отправка по Ctrl+Enter. Через CLI:
+The setting is available in Settings → Installed plugins → Ctrl+Enter Send. From the CLI:
 
 ```sh
 bb plugin config ctrl-enter-send set sendShortcut shift-enter
 bb plugin config ctrl-enter-send unset sendShortcut
 ```
 
-Сброс возвращает Ctrl+Enter. Изменение применяется в открытых окнах без перезагрузки плагина. Подсказка при наведении на доступную кнопку показывает выбранную комбинацию.
+Resetting restores Ctrl+Enter. Changes apply in open windows without reloading the plugin. Hovering over an available send button shows the selected shortcut.
 
-Меню автодополнения, голосовой ввод и IME сохраняют поведение BB. Alt+Enter и Ctrl/Command+Shift+Enter не перехватываются. Отключение плагина восстанавливает стандартные клавиши и подсказки.
+Autocomplete menus, voice input, and IME retain BB's behavior. Alt+Enter and Ctrl/Command+Shift+Enter are not intercepted. Disabling the plugin restores BB's keyboard handling and tooltips.
