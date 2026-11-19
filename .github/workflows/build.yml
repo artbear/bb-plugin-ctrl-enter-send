@@ -1,0 +1,70 @@
+name: Build plugin
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plugin-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Build plugin
+        run: npx --yes --package=bb-app@0.49.0 -- bb plugin build .
+      - name: Package plugin directory
+        id: pack
+        shell: bash
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const { statSync } = require("node:fs");
+          const { bb } = require("./package.json");
+          for (const entry of ["app", "server", "host"]) {
+            if (bb[entry]) {
+              for (const extension of ["js", "meta.json"]) {
+                const path = `dist/${entry}.${extension}`;
+                if (!statSync(path).size) throw new Error(`Empty build output: ${path}`);
+              }
+            }
+          }
+          NODE
+
+          package="$(node -p 'require("./package.json").name')"
+          version="$(node -p 'require("./package.json").version')"
+          basename="$package-$version"
+          stage="$RUNNER_TEMP/plugin-stage"
+          output="$RUNNER_TEMP/plugin-artifact"
+          mkdir -p "$stage/$package" "$output"
+          git archive HEAD | tar -xf - -C "$stage/$package" --exclude=.github
+          cp -a dist "$stage/$package/"
+          tar -czf "$output/$basename.tar.gz" -C "$stage" "$package"
+          (
+            cd "$output"
+            sha256sum "$basename.tar.gz" > SHA256SUMS
+          )
+          echo "name=$basename" >> "$GITHUB_OUTPUT"
+      - name: Upload plugin
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: ${{ steps.pack.outputs.name }}-${{ github.sha }}
+          path: ${{ runner.temp }}/plugin-artifact/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
